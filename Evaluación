@@ -1,0 +1,202 @@
+Primer programa:
+
+% Hechos de parentesco
+madre(mirian, ricardo).
+padre(marcelo, raul).
+padre(marcelo, rita).
+padre(juan, marcelo).
+padre(juan, maria).
+padre(raul, sergio).
+madre(rita, victor).
+madre(rita, veronica).
+
+% Hechos de estado civil
+% Sin datos específicos sobre casamientos, se asume algunos ejemplos
+casado(juan, carla).
+
+% Hechos de atributos
+lindo(mirian).
+lindo(rita).
+
+% Reglas para determinar abuelos y nietos
+abuelo(X, Y) :- padre(X, Z), padre(Z, Y).
+abuelo(X, Y) :- padre(X, Z), madre(Z, Y).
+nieto(Y, X) :- abuelo(X, Y).
+
+% Reglas para determinar hermanos
+hermano(X, Y) :- padre(Z, X), padre(Z, Y), X \= Y.
+hermana(X, Y) :- padre(Z, X), padre(Z, Y), X \= Y, mujer(X).
+hermana(X, Y) :- madre(Z, X), madre(Z, Y), X \= Y, mujer(X).
+
+% Género, necesario para algunas reglas (asumiendo algunos)
+mujer(mirian).
+mujer(maria).
+mujer(rita).
+mujer(veronica).
+
+hombre(marcelo).
+hombre(raul).
+hombre(sergio).
+hombre(victor).
+hombre(juan).
+
+% Regla para determinar quién está casado con una persona linda
+casado_con_lindo(X) :- casado(X, Y), lindo(Y).
+casado_con_lindo(X) :- casado(Y, X), lindo(X).
+
+% Reglas para determinar tíos y sobrinos
+tio(Tio, Sobrino) :- padre(Padre, Sobrino), hermano(Tio, Padre).
+tio(Tio, Sobrino) :- madre(Madre, Sobrino), hermano(Tio, Madre).
+
+% Regla para familiares lindos (simplificación)
+familiares_lindos(X, Y) :- lindo(X), lindo(Y), padre(Z, X), padre(Z, Y), X \= Y.
+
+% a. Consulta para saber quién es el abuelo de Victor
+?- abuelo(X, victor).
+
+% b. Consulta para saber quién es el nieto de Raul
+?- nieto(X, raul).
+
+% c. Consulta para saber quién es la hermana de Victor
+?- hermana(X, victor).
+
+% d. Consulta para saber quién es la hermana de Veronica
+?- hermana(X, veronica).
+
+% e. Consulta para saber de quién es hija Veronica
+?- madre(X, veronica).
+
+% f. Consulta para saber quién está casado con alguien lindo
+?- casado_con_lindo(X).
+
+% g. Consulta para ver la relación familiar entre personas lindas
+?- familiares_lindos(X, Y).
+
+% h. Consulta para saber quiénes son tíos y cuáles son sus sobrinos
+?- tio(X, Y).
+
+Segundo programa:
+
+% Hechos de personas con su sexo
+persona(barbara, femenino).
+persona(roberto, masculino).
+persona(susana, femenino).
+persona(juan, masculino).
+persona(maria, femenino).
+persona(pedro, masculino).
+
+% Hechos de amistades
+amistad(barbara, roberto).
+amistad(susana, juan).
+amistad(barbara, juan).
+amistad(barbara, maria).
+amistad(susana, pedro).
+
+% Regla para identificar si una persona es sospechosa (criterios a, b, c)
+
+% a. Hombres que eran amigos de Susana.
+sospechoso(X) :- 
+    persona(X, masculino),
+    amistad(susana, X).
+
+% b. Mujeres que fueron amigas de hombres que conocían a Susana.
+sospechoso(X) :- 
+    persona(X, femenino),
+    amistad(X, Y),
+    persona(Y, masculino),
+    amistad(susana, Y).
+
+% c. Amigos de mujeres que fueron amigas de hombres que conocían a Susana.
+sospechoso(X) :- 
+    amistad(X, Z),
+    persona(Z, femenino),
+    amistad(Z, Y),
+    persona(Y, masculino),
+    amistad(susana, Y).
+
+
+% Consulta para obtener todos los sospechosos.
+?- sospechoso(X).
+
+Tercer programa:
+
+% Propietarios de autos (excepto Jorge)
+auto(juan).
+auto(josé).
+auto(jeremías).
+% auto(jorge) no es necesario ya que no trajo su auto.
+
+% Personas que pueden ir caminando
+puede_caminar(aída).
+puede_caminar(analía).
+
+% Personas que viven lejos
+vive_lejos(roberto).
+vive_lejos(raúl).
+vive_lejos(rodrigo).
+vive_lejos(ana).
+vive_lejos(anacleta).
+vive_lejos(anastasia).
+
+% Conductores seguros
+conductor_seguro(josé).
+conductor_seguro(jeremías).
+
+% Amistades
+amigos(anacleta, juan).
+amigos(anastasia, josé).
+amigos(roberto, jeremías).
+amigos(ana, josé).
+amigos(analía, juan).
+% No es necesario declarar la amistad entre raúl y josé, ya que no son amigos.
+% Aída no conoce a ninguno, por lo que no se declara su amistad con nadie.
+
+% Consumo de alcohol
+bebio_alcohol(juan).
+% Se asume que los demás, o no bebieron o bebieron solo jugo, excepto Jorge cuyo estado no se conoce.
+
+
+% Regla para determinar si alguien puede llegar a casa seguro por su cuenta
+llega_seguro(X) :- puede_caminar(X).
+llega_seguro(X) :- auto(X), conductor_seguro(X).
+
+% Regla para determinar si alguien puede llegar a casa seguro gracias a un amigo
+llega_seguro_con_amigo(X) :- 
+    vive_lejos(X),
+    amigos(X, Y),
+    auto(Y),
+    conductor_seguro(Y).
+
+
+% Consulta para obtener todos los que llegan seguros a casa solos
+?- llega_seguro(X).
+
+% Consulta para obtener todos los que llegan seguros a casa con ayuda
+
+Cuarto programa:
+
+conectado(nueva_cordoba, alta_cordoba, 3000).
+conectado(nueva_cordoba, casco_centrico, 200).
+conectado(casco_centrico, villa_allende, 4000).
+conectado(alta_cordoba, villa_allende, 750).
+conectado(nueva_cordoba, villa_arguello, 5000).
+conectado(villa_arguello, villa_allende, 3000).
+conectado(nueva_cordoba, las_palmas, 4000).
+conectado(las_palmas, villa_allende, 3200).
+conectado(nueva_cordoba, los_platanos, 2000).
+conectado(los_platanos, san_fernando, 3000).
+conectado(san_fernando, villa_allende, 1700).
+
+ruta(Inicio, Fin, Visitados, Distancia, Ruta) :-
+    conectado(Inicio, Intermedio, DistIntermedio),
+    not(member(Intermedio, Visitados)),
+    ruta(Intermedio, Fin, [Intermedio | Visitados], DistRestante, RutaRestante),
+    Distancia is DistIntermedio + DistRestante,
+    Ruta = [Inicio | RutaRestante].
+
+ruta(Fin, Fin, _, 0, [Fin]).
+
+%Consulta
+ruta(nueva_cordoba, villa_allende, [nueva_cordoba], Distancia, Ruta).
+?- llega_seguro_con_amigo(X).
+
